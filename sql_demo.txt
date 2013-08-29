@@ -1,0 +1,38 @@
+创建文件路径:
+create directory tempdir as 'D:/temp/'
+
+删除文件路径tempdir:
+drop directory TEMPDIR;
+########################################################
+创建schema:
+create user  zhonghai_design identified by 1
+(demo:create user  %username% identified by %password%)
+
+创建schema并设置NNC_DATA01为默认表空间，temp为临时表空间:
+CREATE USER ae_65_base IDENTIFIED BY 1 DEFAULT TABLESPACE NNC_DATA01 TEMPORARY TABLESPACE temp;
+#########################################################
+给新创建的schema授权：
+Grant read,write on directory tempdir to zhonghai_design
+grant connect, dba to zhonghai_design
+(demo:grant connect, grant to %username%)
+grant connect to zhonghai_design
+#############################################################
+进入sql:
+-->cmd
+-->sqlplus
+###############################################################
+删除用户(schema)：
+drop user ZHONGHAI_DESIGN CASCADE;
+##############################################################
+更改NNC_DATA01的表空间大小为8G:
+ALTER DATABASE  datafile 'E:\ORADATA\NNC_DATA01' resize 8G;
+###############################################################
+创建表空间:
+CREATE TABLESPACE NNC_DATA01 DATAFILE 'D:\ORACLE\ORADATA\ORA9I\nnc_data01.dbf' SIZE 500M AUTOEXTEND ON NEXT 50M EXTENT MANAGEMENT LOCAL UNIFORM SIZE 256K ;
+CREATE TABLESPACE NNC_INDEX01 DATAFILE 'D:\ORACLE\ORADATA\ORA9I\nnc_index01.dbf' SIZE 500M AUTOEXTEND ON NEXT 50M EXTENT MANAGEMENT LOCAL UNIFORM SIZE 128K ;
+################################################################
+oracle数据库新建design数据库规范sql:
+CREATE TABLESPACE NNC_DATA01 DATAFILE 'D:\ORACLE\ORADATA\ORA9I\nnc_data01.dbf' SIZE 500M AUTOEXTEND ON NEXT 50M EXTENT MANAGEMENT LOCAL UNIFORM SIZE 256K ;
+CREATE TABLESPACE NNC_INDEX01 DATAFILE 'D:\ORACLE\ORADATA\ORA9I\nnc_index01.dbf' SIZE 500M AUTOEXTEND ON NEXT 50M EXTENT MANAGEMENT LOCAL UNIFORM SIZE 128K ;
+CREATE USER ae_65_base IDENTIFIED BY 1 DEFAULT TABLESPACE NNC_DATA01 TEMPORARY TABLESPACE temp;
+GRANT connect,dba to NC61;

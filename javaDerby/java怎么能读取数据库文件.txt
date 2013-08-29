@@ -1,0 +1,27 @@
+现在sun下一个jdbc-odbc驱动
+然后建一个数据源
+//sql为查询语句
+import java.sql.Statement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+
+   
+conStr="jdbc:odbc:[数据源名]"  
+Connection conn = DriverManager.getConnection(conStr);
+Statement state = (Statement) conn.createStatement();
+Result result=state.execute(sql);
+conn.close();
+
+
+
+stringBuilder很不错的，完全可以替代string,最主要的是它的效率高:
+
+//必须先实例化一个
+stringBuilder sBuilder = new stringBuilder();
+//您可以拼接执行SQL语句,易于阅读
+sBuilder.Append("select * from tb1");
+sBuilder.Append("where id=1");
+
+上面同等于
+strng sBuilder = "select * from tb1 where id=1";s
+

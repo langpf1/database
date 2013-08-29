@@ -1,0 +1,28 @@
+导入数据库分三步：
+ 1.建用户
+ 2.建目录并分配目录给用户
+ 3.导入到用户
+
+建用户：
+CREATE USER BAP_HR IDENTIFIED BY 1  DEFAULT TABLESPACE NNC_DATA01 TEMPORARY TABLESPACE temp_tbs;
+给用户授权：
+GRANT connect,dba to BAP_HR;
+
+##################################################
+EXPDP导出的数据 只能用 IMPDP导入
+如果是 EXPDP导出 那么还要确定 导入与导出的用户名是否一致 表空间是否一致,如果不一致:
+
+impdp zt/zt directory=zt dumpfile=zt.dmp full=y remap_tablespace=users01:users
+
+//当表空间不同时users01代表zt.dmp的表空间,users代表需要导入的表空间名remap_schema=zt:just
+
+//当导入与导出的用户名不同时 zt代表zt.dmp被导出的数据库名 just表示要将zt.dat导入到just用户,语法大概是这个样子 可能位置写反了 如果出错就反着写试一下
+
+exp bap_newpack_dw10/1 file=bap_newpack_dw10.dmp full=y log=bap_newpack_dw10.log
+ 
+imp bap_gdjt_dw_1205/1 file=bap_dw_20121126.dmp full=y log=2.log
+ 
+exp BAP_XAH/1 file=BAP_XAH.DMP tables=BA_DIM_FAR_PSNDOC 
+
+
+expdp cfstest03/cfstest03@roldev directory=DATA_PUMP_DIR dumpfile=cfstest03.DMP SCHEMAS=cfstest03 

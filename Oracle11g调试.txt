@@ -1,0 +1,57 @@
+Microsoft Windows [版本 5.2.3790]
+(C) 版权所有 1985-2003 Microsoft Corp.
+
+C:\Documents and Settings\Administrator>sqlplus
+
+C:\Documents and Settings\Administrator>sqlplus /nolog
+
+SQL*Plus: Release 11.2.0.1.0 Production on 星期五 6月 7 13:45:06 2013
+
+Copyright (c) 1982, 2010, Oracle.  All rights reserved.
+
+SQL> connect sys/ae1234 as sysdba
+已连接到空闲例程。
+SQL> startup
+ORA-03113: 通信通道的文件结尾
+SQL> host lsnrctl status
+LSNRCTL for 64-bit Windows: Version 11.2.0.1.0 - Production on 07-6月 -2013 13:5
+5:54
+Copyright (c) 1991, 2010, Oracle.  All rights reserved.
+
+正在连接到 (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=20.10.130.235)(PORT=1521)))
+
+LISTENER 的 STATUS
+------------------------
+别名                      LISTENER
+版本                      TNSLSNR for 64-bit Windows: Version 11.2.0.1.0 - Produ
+ction
+启动日期                  07-6月 -2013 13:52:04
+正常运行时间              0 天 0 小时 3 分 50 秒
+跟踪级别                  off
+安全性                    ON: Local OS Authentication
+SNMP                      OFF
+监听程序参数文件          D:\oracle\product\11.2.0\dbhome_1\network\admin\listen
+er.ora
+监听程序日志文件          d:\oracle\product\11.2.0\dbhome_1\log\diag\tnslsnr\iuf
+odb\listener\alert\log.xml
+监听端点概要...
+  (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=20.10.130.235)(PORT=1521)))
+监听程序不支持服务
+命令执行成功
+SQL> host lsnrctl reload;
+
+LSNRCTL for 64-bit Windows: Version 11.2.0.1.0 - Production on 07-6月 -2013 13:5
+6:15
+
+Copyright (c) 1991, 2010, Oracle.  All rights reserved.
+
+正在连接到 (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=20.10.130.235)(PORT=1521)))
+
+命令执行成功
+
+SQL> connect bap_63_base/03208
+已连接。
+SQL> exit
+从 Oracle Database 11g Enterprise Edition Release 11.2.0.1.0 - 64bit Production
+With the Partitioning, OLAP, Data Mining and Real Application Testing options 断
+开

@@ -1,0 +1,6 @@
+imp bap_63_base/03208 file=D:\temp\uap63_maolin_oracle0518.dmp log=uap63_maolin_oracle0518.log full=y ignore=y 
+
+Oracle***Service
+Oracle***ClrAgent
+Oracle***TNSListener
+Oracle***ORCL

@@ -1,0 +1,71 @@
+对ORACLE数据库进行远程操作，假设数据库在192.168.1.110上，具体方法如下：
+
+一、在客户端创建和服务端对应的服务名
+
+方法1：
+
+修改tnsnames.ora文件（磁盘:\oracle\product\10.1.0\Db_1\NETWORK\ADMIN\tnsnames.ora）
+
+加入远程服务器的命名：
+
+Sql代码
+
+TEST_ORCL =  
+
+(DESCRIPTION =  
+
+    (ADDRESS_LIST =  
+
+      (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.1.110)(PORT = 1521))  
+
+    )  
+
+    (CONNECT_DATA =  
+
+      (SERVICE_NAME = orcl)  
+
+    )  
+
+)
+
+方法2：
+
+在oracle客户端，打开net manager。
+
+创建一个服务命名TEST_ORCL，主机IP为：192.168.1.110，服务名orcl，端口1521
+
+二、测试远程服务器是否畅通
+
+进入到cmd后，执行命令:tnsping TEST_ORCL。
+
+三、远程操作数据库
+
+导出：
+
+Sql代码
+
+1：exp username/password@TEST_ORCL file=bak_filepath
+
+2：exp username/password@TEST_ORCL full=y file=bak_filepath
+
+3: 按表的方式导出
+
+   exp username/password@TEST_ORCL file= d:\data\newsmgnt.dmp tables=(inner_notify,notify_staff_relat)
+
+username 用户名，password 密码，TEST_ORCL 客服端服务名，bak_filepath 备份文件存放的路径
+
+导入：
+
+Sql代码
+
+1：imp username/password@TEST_ORCL file=bak_filepath full=y
+
+2：imp username/password@TEST_ORCL/database_name file=bak_filepath full=y
+
+3：imp username/password@TEST_ORCL file=bak_filepath fromuser=fromadmin touser=toadmin
+
+username 用户名，password 密码，TEST_ORCL 客服端服务名，bak_filepath 备份文件存放的路径
+
+fromadmin 备份数据的用户名，toadmin 还原数据库的用户名。database_name 还原到那个数据库上
+
+full=y 将数据库整体导出，包括表结构等。

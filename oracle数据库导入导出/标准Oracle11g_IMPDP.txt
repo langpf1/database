@@ -1,0 +1,55 @@
+1.oracle数据库中一个schema代表一个用户名，即schema=user,schemas=users.其它数据库不一定是这样
+
+2.下面的命令是将schema名称是foodmart的导出的*.dp文件导入到schema名为ae_common的用户中：
+
+impdp ae_common/1 directory=tmpdir dumpfile=foodmart2012.dp remap_schema=foodmart:ae_common
+
+//其中，remap_schema=foodmart:ae_common即表示将用户名为foodmart的*.dp导出文件导入到用户名为
+ae_common的用户中。
+
+成功案例：
+imp ae_design/1 file=D:\design\uap63_maolin_oracle0518.dmp log=uap63_maolin_oracle0518.log full=y ignore=y 
+
+impdp ae_common/1 directory=tmpdir dumpfile=foodmart2012.dp remap_schema=foodmart:ae_common
+
+imp zhonghai_design/1 file=D:\temp\zhys0618.dmp full=y
+
+imp hssn0526/1 file=D:/temp/ic.dmp full=y
+######################################################################
+3.使用管道快速导入导出数据步骤：
+ 
+  1> 创建DIRECTORY(有的话就不必在再创建)
+     创建存放目录：
+     mkdir -p /home/oracle/dir_dp
+ 
+  2> 登录oracle命令行执行下面的命令：
+     create directory tempdir as '/home/oracle/dir_dp';//自己的文件存放路径
+ 
+  3> 授权ae_common用户(有权限则不必再授权)
+     Grant read,write on directory tempdir to ae_common
+ 
+  4> 在终端命令行(cmd)执行导入导出：
+expdp ae_common/* schemas=ae_common directory=tempdir dumpfile=foodmart2012.dp logfile=ae_common.expdp.log;
+ 
+导入
+impdp ae_common/* schemas=ae_common directory=tempdir dumpfile=foodmart2012.dp logfile=ae_common.impdp.log;
+
+impdp ae_common/1 schemas=ae_common directory=tempdir file=foodmart2012.dp full=y 
+ 
+impdp ae_common/1 directory=tmpdir dumpfile=foodmart2012.dp
+#####################################################################
+4.导入导出命令解释：
+imp usename/password@SID full=y  file= d:\data\xxxx.dmp ignore=y
+
+imp system/manager file=f:\foodmart2012.dp log=foodmart_log full=y ignore=y 
+
+imp ae/1 file=f:\foodmart2012.dp log=foodmart_log full=y ignore=y 
+
+system/manager是用户名和密码 
+file=bible_db 是要导入的文件 
+log=dible_db是生成日志的名称 
+full=y是导入整个文件 
+ignore=y是忽略创建错误 
+
+详细用法可在“运行”中输入cmd进入命令窗口键入 
+'IMP HELP=Y' 获取帮助信息提示

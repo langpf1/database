@@ -1,0 +1,332 @@
+Derby 数据库默认启动端口为1527
+
+第一篇文章的结尾讨论了如何正确设置系统以使用 Derby 数据库。总之，因为 Derby 是 Java 应用程序，所以必须正确初始化 CLASSPATH 环境变量。可以设置 DERBY_INSTALL 环境变量，然后将相关的 Java Archive (JAR) 文件添加到 shell 初始化文件（比如 .bashrc 文件）中的 CLASSPATH 中，命令如下： 
+
+export DERBY_INSTALL='/opt/Apache/db-derby-10.1.2.1-bin'
+export CLASSPATH=$DERBY_INSTALL/lib/derby.jar
+export CLASSPATH=$CLASSPATH:$DERBY_INSTALL/lib/derbytools.jar:.
+通过创建批处理文件可以在 Microsoft Windows? 系统上获得同样的效果，命令如下： 
+
+set DERBY_INSTALL=C:\Apache\db-derby-10.1.2.1-bin
+set CLASSPATH=%DERBY_INSTALL%\lib\derby.jar
+set CLASSPATH=%CLASSPATH%;%DERBY_INSTALL%\lib\derbytools.jar;. 
+注意：在这两个示例中，CLASSPATH 环境变量的初始化（通过 export 或 set shell 命令）都用两个步骤完成
+
+当 ij 工具启动时，显示版本信息并提供提示符，提示符默认情况下是一个大于符号 (>)。在该提示符下，运行 connect 命令，连接数据库。connect 命令需要一个指示符字符串用于查找要连接的数据库。在本例中，该连接字符串是 jdbc:derby:test;create=true。正式地，该字符串称为 Java Database Connectivity (JDBC) URL。（JDBC 是一种 Java 技术，允许 Java 应用程序与数据库通信。） 
+
+对 JDBC URL 的完全分析超出了本文范围（请参阅 参考资料 部分获得更多信息）。但是，本例十分简单，可分解如下： 
+
+jdbc 是 ij 工具与数据库服务器通信的机制。 
+derby 是 JDBC 驱动程序类的名称，ji 工具使用该类与数据库服务器通信。 
+test 是要创建的数据库名称。 
+create=true 是应传递给 Derby JDBC 驱动程序的特定属性。 JDBC 属性列在 URL 其他部分的后面，并用分号分隔。 
+
+help;获得 ij 工具的帮助
+现在不需要到同一数据库的两个连接，因此可以使用 disconnect ; 命令关闭当前连接。发出另一个 show connections ; 命令将显示当前惟一打开的连接，但还会看到没有当前连接
+
+Derby 风格
+这个 文章系列 遵守特定的风格：所有 SQL 命令都用大写，项目名称采用 camelCase 方式，在 camelCase 风格中，单词被连在一起，第一个单词之后的每个单词的第一个字母大写，例如 aLongIdentifier。把这两种风格组合在一起，这些文章写 SQL 命令时的风格是这样：SELECT aLongIdentifier FROM bigdog.dataTable
+
+Derby SQL
+清单 1. Apache Derby 的 CREATE TABLE 语法
+--Comment describing the purpose and layout of the table
+
+CREATE TABLE [schemaName.]tableName (
+    { <columnDefinition> | <tableLevelConstraint>  } [,
+        { <columnDefinition> | <tableLevelConstraint>  }
+    ]*
+) ;
+方括号（[ 和 ]）中的是可选参数。从正式语法中可以看出，模式名是可选的，在必需的头一个列之后（创建连一个列都没有的表是没有意义的），其他列定义或表级约束都是可选的。 
+
+您可能理解列定义的含义，但是可能不理解约束 的意义。约束有两种类型：表级约束和列约束。约束通过某种方式对列或表进行限制。例如，可以用约束要求列总要有实际的值（没有 NULL 值），或者列中的每个项必须是惟一的，或者列被自动分配默认值。在未来的文章中将更详细地介绍约束。
+
+最后一个结束方括号之后的星号（*）代表可以包含一个或多个包含项。这意味着表必须有一个或多个列级或表级约束。竖线（|）表明 “可有可无” 条件。在这个语法示例中，必须定义一个新列或者定义一个表级约束。花括号（{ 和 }）把相关项组织在一起，而圆括号（( 和 )）中是必需的元素 。最后，分号（;）表示 SQL 语句的结束。 
+
+用 dblook 查看模式
+java org.apache.derby.tools.dblook -d jdbc:derby:test
+dblook 工具是一个 Java 类，可以用它方便地把数据库的内容输出到控制台。在命令行上运行它，就像运行其他 Java 程序一样；惟一增加的就是使用 -d jdbc:derby:test 参数，这个参数指定 dblook 工具应当查询的数据库
+
+删除 Derby 中的表
+DROP TABLE [schemaName.]tableName ;
+
+两个破折号 (--) 开头表示是 SQL 注释；您应该使用它们来提供脚本文件中每个主要组件的用途的基本描述
+
+ij> run 'derby.create.sql' ;
+运行合适的脚本文件，通过使用 run 命令可实现该操作，该命令接受单个参数：单引号括起的脚本文件名当该脚本执行时，您可能会看到新 ij> 提示、命令和警告或错误消息的组合。这种显示可能有些笨拙，但 run 命令会执行您的脚本文件，就像您直接将命令键入 ij 工具中一样
+如果正在 Bash shell 中工作，则可以使用 
+java org.apache.derby.tools.ij < derby.create.sql > derby.create.out 2> derby.create.err 
+实现这一点，它运行 derby.create.sql 脚本文件，将输出消息保存到 derby.create.out 中，并将所有 ij 错误消息保存到 derby.create.err 中。 
+
+清单 2. SQL INSERT 语法
+INSERT INTO table-Name
+    [ (Simple-column-Name [ , Simple-column-Name]* ) ]
+	  Expression
+ 
+Expression 词可以扩展为下列四个不同的结构之一：
+单行 VALUES 列表 
+多行 VALUES 列表 
+SELECT 表达式 
+UNION 表达式 
+
+SQL VALUES 表达式的语法相当简单，(INSERT ....VALUES....) 
+清单 3. SQL VALUES 语法
+{
+    VALUES ( Value {, Value }* )
+        [ , ( Value {, Value }* ) ]* |
+    VALUES Value [ , Value ]*
+ }
+该语法首先显示多行格式，然后是单行格式（记住，竖线字符 | 表示或者，星号字符 * 表示一个或多个）。value 词表示想要插入特定列的值。要将数据插入多列，必须将一行的数据括在逗号分隔的括号内
+
+对应的也可以用命令行：
+java org.apache.derby.tools.ij < derby.insert.sql
+
+清单 4. SELECT 语句的形式语法
+SELECT [ DISTINCT | ALL ] SelectItem [ , SelectItem ]*
+FROM clause
+[ WHERE clause ]
+[ GROUP BY clause ]
+[ HAVING clause ] 
+
+SELECT 语句的其他部分都是可选的。但是，在构建第一个查询之前，您应该知道 Apache Derby 对 SELECT 语句组件的求值顺序。当 Apache Derby 处理查询时，求值顺序是： 
+FROM 子句 
+WHERE 子句 
+GROUP BY 子句 
+HAVING 子句 
+SELECT 子句 
+
+表 1. 基本 SQL 布尔操作符
+操作符     示例          描述 
+=       p.price = 29.95 测试任何内置类型是否等于指定值。 
+<       p.price < 29.95 测试任何内置类型是否小于指定值。 
+>       p.price > 29.95 测试任何内置类型是否大于指定值。 
+<=      p.price <= 29.95 测试任何内置类型是否小于等于指定值。 
+>=      p.price >= 29.95 测试任何内置类型是否大于等于指定值。 
+<>      p.price <> 29.95 测试任何内置类型是否等于指定值。 
+IS NULL p.description IS NULL 测试表达式或值是否为 null。 
+IS NOT NULL p.description IS NOT NULL 测试表达式或值是否非 null。 
+AND    (p.price > 29.92) AND (p.itemNumber > 5) 测试两个表达式是否都为真或者值为非零。 
+OR     (p.price > 29.92) OR (p.itemNumber > 5) 测试两个表达式的一个或二者是否为真或值为非零。 
+NOT    NOT v.vendorNumber = 1 测试表达式是否为假或值为零。 
+BETWEEN p.price BETWEEN 29.95 AND 39.95 测试一个值是否包含于两个其他值之间（示例等价于 29.95 <= p.price <= 39.95）。 
+LIKE    v.vendorName LIKE 'Lun%' 测试字符表达式是否与模式相匹配，其中百分比字符 (%) 匹配零个或多个任意字符，下划线字符 (_) 只匹配一个任意字符。 
+
+清单 5. 使用表连接查询两个表
+ij> SELECT p.price, p.description AS "Item", 
+        v.vendorName AS "Vendor"
+        FROM bigdog.products AS p, bigdog.vendors AS v
+        WHERE p.itemNumber = v.itemNumber ;
+
+清单 1. 在查询中使用 DISTINCT 限定符
+ij> connect 'jdbc:derby:test' ;
+ij> SELECT DISTINCT vendorNumber AS "Vendor #" FROM bigdog.vendors ;
+清单 2. 在查询中使用 ORDER BY 子句
+ij> SELECT v.vendorNumber AS "Vendor #", vendorName as "Vendor",
+        p.price as "Price", p.itemNumber AS "Item #"
+    FROM bigdog.products AS p, bigdog.vendors AS v
+    WHERE p.itemNumber = v.itemNumber AND p.price > 20.0
+    ORDER BY v.vendorNumber ASC, p.price DESC ;
+
+在查询中执行数学操作
+表 1. Apache Derby 数学操作符
+操作符    示例      描述 
+一元 +    +1.0   一个空操作，或无操作，如 +4 = 4 
+一元 -    -p.price 将值的符号更改为所应用的符号 
++       p.itemNumber + 10 将第二个值加到第一个值上 
+-       p.itemNumber - 10 将第一个值减去第二个值 
+*       p.price * 1.0825 将第一个值乘以第二个值 
+/       p.price / 100.0 将第一个值除以第二个值 
+
+
+表 2. Apache Derby 类型转换函数
+函数   示例            描述 
+BIGINT BIGINT(123.45) 返回给定字符串或数字的 64-bit 整数常量。 
+CHAR   CHAR(123.45) 返回给定值的固定长度的字符表示，最大长度为 254 个字节，该给定值必须是内置的 Apache Derby 类型之一。可以提供可选的第二个参数以指定字符串的长度。 
+DATE   Date('2006-05-16') 返回输入值的日期表示。 
+DOUBLE DOUBLE(123.45) 返回输入数字或字符串的双精度浮点表示。 
+INTEGER INTEGER(123.45) 返回给定字符串、日期、时间或数字的整数常量。 
+SMALLINT SMALLINT(123.45) 返回给定字符串或数字的小整数常量。 
+TIME     TIME('12:24:30') 返回输入值的时间表示。 
+TIMESTAMP TIMESTAMP('2006-05-16','12:24:30') 返回输入值的时间戳表示。 
+VARCHAR VARCHAR(123.45) 返回给定日期、时间、时间戳或字符串值的长度可变的字符表示，最大长度为 32,672 个字节
+可以使用 CAST 函数来更改字符串的长度或将一种数据类型转换为另一种，其中包括不受 表 2 中列出的类型转换函数支持的那些数据类型（比如 DECIMAL）。
+
+清单 3. 使用 CAST 操作符
+ij> SELECT p.price AS "Price", 
+        DOUBLE(p.price * 1.0825) AS "Float Total", 
+        CAST(p.price * 1.0825 AS DECIMAL(6,2)) AS "Total",
+        CAST(p.description AS CHAR(20)) AS "Description"
+    FROM bigdog.products AS p 
+    WHERE p.price > 21.0 AND p.stockDate < Date('2006-01-21') ;
+ 
+计算聚合值
+表 3. Apache Derby 聚合函数
+函数   示例           描述 
+AVG   AVG(p.price) 返回满足某个表达式的所有行的列的平均值。只能与内置数字数据类型一起使用。返回值的精度由要求值的列的精度来定义。 
+COUNT COUNT(p.price) 返回满足某个表达式（比如查询）的行数。可与任何数据类型一起使用。 
+MAX   MAX(p.price) 返回满足某个表达式的所有行的列的最大值。只能与内置数据类型一起使用。 
+MIN   MIN(p.price) 返回满足某个表达式的所有行的最小值。只能与内置数据类型一起使用。 
+SUM   SUM(p.price) 返回满足某个表达式的所有行的列的总和。只能与内置数据类型一起使用。 
+清单 4. 在查询中使用聚合函数
+ij> SELECT COUNT(p.itemNumber) AS Number, 
+        CAST((AVG(p.price) + 0.005) AS DECIMAL(5,2)) AS Average,
+        MIN(p.stockDate) AS "First Date", MAX(p.stockDate) AS "Last Date"
+    FROM bigdog.products AS p ; 
+
+数学函数
+表 4. Apache Derby 数学函数
+函数            示例       描述 
+ABS or ABSVAL ABS(-1.0) 返回表达式的绝对值，该值必须是内置数值类型之一。返回类型与参数类型相同。 
+MOD           MOD(1, 2) 返回第一个参数除以第二个参数时的余数。返回类型与具有最大整数类型（SMALLINT、INTEGER 或 BIGINT）的参数相同。结果符号由第一个参数的符号单独确定。 
+SQRT          SQRT(0.5) 返回表达式的平方根，该值必须是浮点值。返回类型与参数类型相同。 
+
+日期和时间函数
+例如，可以将清单 3 所示的查询中 WHERE 子句的 p.stockDate < Date('2006-01-21') 部分替换为 YEAR(p.stockDate) < 2006。
+表 5. Apache Derby 日期和时间函数
+函数  示例                    描述 
+DAY    DAY(p.stockDate) 返回一个整数，其中包含一个日期、时间戳或包含有效日期的字符串的日期部分  
+HOUR   HOUR('12:21:30') 返回一个整数，其中包含一个时间、时间戳或包含有效时间的字符串的小时部分 
+MINUTE MINUTE('12:21:30') 返回一个整数，其中包括一个时间、时间戳或包含有效时间的字符串的分钟部分 
+MONTH  MONTH('2005-12-20') 返回一个整数，其中包括一个日期、时间戳或包含有效日期的字符串的月份部分 
+SECOND SECOND('12:21:30') 返回一个整数，其中包括一个时间、时间戳或包含有效时间的字符串的秒钟部分 
+YEAR   YEAR(p.stockDate) < 2006 返回一个整数，其中包括一个日期、时间戳或包含有效日期的字符串的年份部分 
+
+
+字符串函数
+表 6. Apache Derby 字符串函数
+函数                 示例                                描述 
+||            (p.description||v.vendorName)      串联操作符将两个值组合为一个新字符串。如果两个值都是 CHAR 类型，结果还是 CHAR类型。如果值为VARCHAR 类型或数值数据类型（可以转换为 VARCHAR 类型），则结果类型是 VARCHAR。 
+LCASE 或 LOWER  LCASE(p.description) 返回一个字符串，其中输入值中的所有字母字符都转换为小写。 
+LENGTH          LENGTH(p.description) 返回输入值中的字符数。非字符数据隐式转换为字符串。 
+LOCATE          LOCATE('beach',p.description) 返回一个子字符串在搜索字符串中第一次出现的起始位置，如果没找到子字符串，则返回 0。第一个参数是子字符串，第二个参数是搜索字符串，可选的起始位置可以提供作为第三个参数。 
+RTRIM           RTRIM(p.description) 返回一个字符串，其中输入值结尾处的所有空格都被移除。 
+LTRIM           LTRIM(p.description) 返回一个字符串，其中输入值开头处的所有空格都被移除。 
+SUBSTR          SUBSTR(p.description, 1, 4) 返回 VARCHAR 类型的输入字符串的一部分，在指定位置处开始，一直延续到字符串末尾，或延续到可的第三个参数指定的位置。如果起始位置是正值，则它相对于字符串的开头；如果是负值，则是相对于字符串的末尾。 
+UCASE, or UPPER UCASE(p.description) 返回一个字符串，其中输入值中的所有字母字符都已转换为大写。 
+
+
+删除数据
+清单 2.DELETE FROM tableName
+[WHERE clause]
+删除所选行
+ij> DELETE FROM bigdog.products 
+    WHERE description LIKE '%towel%' OR itemNumber <= 3  
+
+更新数据
+清单 3. SQL UPDATE 语句语法
+UPDATE tableName
+        SET columnName = Value
+        [ , columnName = Value} ]*
+        [WHERE clause] 
+例子：
+ij> UPDATE bigdog.products
+    SET price = price * 1.25, stockDate = CURRENT_DATE
+    WHERE itemNumber = 6 ;
+
+表 1. Apache Derby SQL 当前函数
+函数 描述 
+CURRENT_DATE 以合适的 Apache Derby DATE 格式返回当前日期 
+CURRENT_ISOLATION 以两字符字符串返回当前事务处理隔离级别，这将在后续文章中详细讨论 
+CURRENT_SCHEMA 以最多 128 个字符的字符串返回模式名称，用于限定未限定的数据库对象名称 
+CURRENT_TIME 以合适的 Apache Derby TIME 格式返回当前时间 
+CURRENT_TIMESTAMP 以合适的 Apache Derby TIMESTAMP 格式返回当前时间戳 
+CURRENT_USER 以最多 128 个字符的字符串返回当前用户的授权标识符，如果没有当前用户，则返回 APP 
+
+清单 5. 使用嵌入式 SELECT 更新行
+ij> UPDATE bigdog.products
+    SET price = price * 1.10, description = 'NEW: ' || description
+    WHERE itemNumber IN 
+        ( SELECT v.itemNumber 
+          FROM bigdog.products as p, bigdog.vendors as v 
+          WHERE p.itemNumber = v.itemNumber AND v.vendorNumber = 3 ) ; 
+
+表 2. Apache Derby SQL 操作符和表子查询
+操作符      示例                        描述 
+IN       itemNumber IN（表子查询） 如果表达式的值在表子查询中，则返回 TRUE，该表子查询只能返回单个列。可以包括 NOT 操作符，如 NOT IN，以仅选择不在表查询中的行。 
+EXISTS   EXISTS（表子查询） 如果表子查询返回任何行，则返回 TRUE，如果没有选择任何行，则返回 FALSE。这意味着，取决于表子查询选择的行数，将修改所有行或不修改任何行。可以包括 NOT 操作符以反转该规则。 
+ALL      itemNumber = ALL（表子查询） 称为量化比较，因为 ALL 关键字修改比较操作符（=、<、>、<=、>= 或 <> 之一），所以仅当对所有行都为真时，结果才为 TRUE。该表子查询可以返回多个行，但它们必须只有一个列。 
+ANY      itemNumber = ANY （表子查询） 另一个量化比较，但是在这个查询中，如果它对于任一行为真，则结果为 TRUE。SOME 可以用作 ANY 的同义词。该表子查询可以返回多个行，但它们必须只有一个列。 
+
+
+修改表模式
+清单 6. 更新表
+ij> CREATE TABLE bigdog.newProducts (
+    itemNumber INT NOT NULL,
+    price DECIMAL(5, 2),
+    stockDate DATE,
+    count INT NOT NULL DEFAULT 0,
+    description VARCHAR(40)
+) ;
+0 rows inserted/updated/deleted
+ij> INSERT INTO bigdog.newProducts(itemNumber, price, stockDate, description) 
+    SELECT itemNumber, price, stockDate, description FROM bigdog.products ;
+5 rows inserted/updated/deleted
+ij> DROP TABLE bigdog.products ;
+0 rows inserted/updated/deleted
+ij> RENAME TABLE bigdog.newProducts TO products ; 
+如本例所示，要修改表，在本例中是将一个新列 count 添加到 bigdog.products 表中，首先要创建一个具有需要的正确模式的表。本例需要包括列约束 NOT NULL 使之始终具有有效的值，并通过使用列约束 DEFAULT 0 为 count 列分配默认值 0。注意如何通过将列顺序列出来合并多列约束
+
+清单 2. 使用 GROUP BY 和 HAVING 子句的分组结果
+                
+ij> SELECT COUNT(p.itemNumber) AS Number, AVG(p.price) AS Average
+        FROM bigdog.products AS p, bigdog.vendors AS v
+        WHERE p.itemNumber = v.itemNumber
+        GROUP BY v.vendorNumber ;
+NUMBER     |AVERAGE    
+-----------------------
+6          |31.4633    
+2          |39.9500    
+2          |23.9500    
+
+3 rows selected
+ij> SELECT v.vendorNumber, 
+        COUNT(p.itemNumber) AS Number, AVG(p.price) AS Average
+        FROM bigdog.products AS p, bigdog.vendors AS v
+        WHERE p.itemNumber = v.itemNumber
+        GROUP BY v.vendorNumber
+        HAVING v.vendorNumber > 1 ;
+VENDORNUMB&|NUMBER     |AVERAGE    
+-----------------------------------
+2          |2          |39.9500    
+3          |2          |23.9500    
+
+2 rows selected
+对 NULL 值进行分组
+有时，按照查询选择的行包含 NULL 值。在这种情况下，可能想知道在尝试使用包含 NULL 值的列对行进行分组会发生什么情况。答案是很简单的，而且实际上就是想得到的结果，因为 NULL 值不会影响分组结果。 
+
+好视图无价
+清单 3. 使用视图的正式语法
+CREATE VIEW schema.viewName
+    [ ( columnName1 [, columnName2] * ) ]
+AS sqlQuery ;
+
+DROP VIEW schema.viewName ;
+清单 4. 在 Apache Derby 中创建和删除视图
+ij> CREATE VIEW bigdog.vendorList (Name)
+    AS SELECT DISTINCT vendorName FROM bigdog.vendors ;
+0 rows inserted/updated/deleted
+DROP VIEW bigdog.vendorList 
+ 
+用索引加速
+清单 6. Apache Derby SQL 索引操作的正式语法
+CREATE [UNIQUE] INDEX schema.indexName
+ON schema.tableName ( columnName [ ASC | DESC ]
+    [ , columnName [ ASC | DESC ]] * ) ;
+
+DROP INDEX schema.indexName ;
+    
+RENAME INDEX indexName TO newIndexName ;  
+清单 7. 在 Apache Derby 中使用索引
+ij> SET SCHEMA bigdog ;
+0 rows inserted/updated/deleted
+ij> CREATE INDEX productsIndex ON products(itemNumber) ;
+0 rows inserted/updated/deleted
+ij> RENAME INDEX productsIndex TO pi ;
+0 rows inserted/updated/deleted
+ij> DROP INDEX pi ;
+0 rows inserted/updated/deleted
+ 
+
+
+参考：
+https://www.ibm.com/developerworks/cn/views/opensource/libraryview.jsp?type_by=%E6%96%87%E6%A1%A3%E5%BA%93&view_by=search&search_by=%E7%94%A8+Apache+Derby+%E8%BF%9B%E8%A1%8C%E5%BC%80%E5%8F%91
+http://www.ibm.com/developerworks/cn/opensource/top-projects/derby.html

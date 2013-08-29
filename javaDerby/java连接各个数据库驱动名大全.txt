@@ -1,0 +1,182 @@
+在java中，用JDBC与数据库操作需要以下几个过程：
+
+（1）加载驱动程序
+
+   要连接数据库，首先要加载JDBC驱动程序。加载JDBC驱动程序的语句如下：
+
+   Clsas.forName(JDBC驱动程序名)；
+
+（2）连接数据库
+
+加载了JDBC驱动程序后，便可以连接数据库了。连接数据库使用以下语句：
+
+  Connection  对象名=DriverManager.getConnection(数据库URL，用户名，用户密码);
+
+（3）执行SQL
+
+要对连接的数据库进行查询，更改，或者添加数据，使用Statement接口执行SQL语句，格式如下：
+
+  Statement 对象名=Connection对象名.createStatement();
+
+如：Connection conn=DriverMagager.getConnection(数据库URL，用户名，用户密码);
+
+       Statement sm=conn.createStatement();
+
+执行SQL语句时，所使用的方法：executeQuery(sql语句)，用于SELECT语句的查询；executeUpdate(sql语句),用于UPDATE,INSERT,DELETE等语句；
+
+对于executeQuery()方法其返回的值是ResultSet,有ResultSet建立的对象获取
+
+如：ResultSet rs=sm.executeQuery(SELECT语句);
+
+但其只支持前向获取数据，不能读取已读数据
+
+（4）关闭连接
+
+对于Connection ,Statement,ResultSet等接口，在操作完后调用close()方法关闭
+
+如conn.close();
+
+
+
+=================================
+/**Oracle数据库连接*/
+
+数据库驱动程序名:
+oracle.jdbc.dirver.OracleDriver
+数据库连接地址：
+jdbc:oracle:thin:@localhost:1521:orcl
+//这里的orcl为数据库(SID实例名)
+
+------------
+Microsoft SQL Server 2000: 
+数据库驱动程序名:
+com.microsoft.jdbc.sqlserver.SQLServerDriver
+数据库连接地址：jdbc:microsoft:sqlserver://localhost:1433;DatabaseName=db_name  //db_name为数据库名 
+
+
+------------
+Microsoft SQL Server 2005: 
+数据库驱动程序名:
+com.microsoft.sqlserver.jdbc.SQLServerDriver
+数据库连接地址:
+jdbc:sqlserver://localhost:1433;DatabaseName=db_name  //db_name为数据库名 
+
+------------ 
+
+MySQL： 
+数据库驱动程序名:
+com.mysql.jdbc.Driver
+或
+org.gjt.mm.mysql.Driver
+数据库连接地址:
+jdbc:mysql://localhost:3306/数据库名 
+<mysql有几种，建议不懂的自己查>
+MySQL驱动程序下载地址：http://www.mysql.com/mm.mysql-2.0.2-bin.jar
+
+
+------------
+/**Sybase数据库连接*/
+
+数据库驱动程序名：
+base.jdbc.SybDriver
+数据库连接地址:
+jdbc:sybase:Tds:localhost:5007/erp 
+//erp为数据库名
+Properties sysProps=System.getProperties();
+sysProps.put("user","sa");//用户名
+sysProps.put("password","");//密码
+java.sql.Connection conn=DriverManager.getConnection(url,SysProps);
+
+ 
+
+----------------
+/**DB2数据库连接*/
+
+数据库驱动程序名：
+com.ibm.db2.jdbc.app.DB2Driver
+com.ibm.db2.jdbc.net.DB2Driver
+数据库连接地址：
+jdbc:db2://localhost:5000/数据库名
+jdbc:db2://localhost:6789/数据库名
+
+
+----------------
+/**Imformix数据库连接*/
+
+数据库驱动程序名：
+com.informix.jdbc.IfxDriver
+数据库连接地址：
+jdbc:informix-sqli://localhost:1533/test:INFORMIXSERVER=infserver 
+
+//test为数据库名
+
+-------------------
+/**Sql Server数据库连接*/
+数据库驱动程序名：
+com.microsoft.jdbc.sqlserver.SQLServerDriver
+数据库连接地址：jdbc:microsoft:sqlserver://localhost:1433;DatabaseName=pubs
+//pubs数据库名
+
+-----------------
+/**PostgreSQL数据库连接*/
+
+数据库驱动程序名：
+org.postgresql.Driver
+数据库连接地址：
+jdbc:postgresql://localhost/netshop 
+//newshop数据库名
+
+-----------------
+Sysbase: 
+数据库驱动程序名"com.sybase.jdbc.SybDriver //驱动程序 
+数据库连接地址"jdbc:Sysbase://localhost:5007/db_name  //db_name为数据可名 
+
+-----------------
+
+Oracle(用thin模式): 
+数据库驱动程序名：
+oracle.jdbc.driver.OracleDriver
+ //连接数据库的方法 
+数据库连接地址：
+jdbc:oracle:this:@loaclhost:1521:orcl
+ //orcl为数据库的SID 
+
+-----------------
+
+PostgreSQL: 
+数据库驱动程序名：org.postgresql.Driver
+ //连接数据库的方法 
+数据库连接地址：jdbc:postgresql://localhost/db_name
+ //db_name为数据可名 
+
+-----------------
+DB2： 
+数据库驱动程序名：
+com.ibm.db2.jdbc.app.DB2.Driver
+ //连接具有DB2客户端的Provider实例 
+//数据库驱动程序名：com.ibm.db2.jdbc.net.DB2.Driver
+ //连接不具有DB2客户端的Provider实例 
+数据库连接地址"jdbc:db2://localhost:5000/db_name
+ //db_name为数据可名 
+
+-----------------
+
+Informix: 
+数据库驱动程序名：
+com.informix.jdbc.IfxDriver 
+数据库连接地址：
+jdbc:Informix-sqli://localhost:1533/db_name:INFORMIXSER=myserver
+ //db_name为数据可名 
+-----------------
+
+JDBC-ODBC: 
+数据库驱动程序名：
+sun.jdbc.odbc.JdbcOdbcDriver
+数据库连接地址：
+jdbc:odbc:dbsource
+ //dbsource为数据源名 
+
+----------------
+Derby
+org.apache.derby.jdbc.EmbeddedDriver
+jdbc:derby://localhost:1527:数据库名称;create=false
