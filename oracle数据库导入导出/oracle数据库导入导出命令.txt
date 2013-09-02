@@ -1,0 +1,12 @@
+imp usename/password@SID full=y  file= d:\data\xxxx.dmp ignore=y
+
+imp system/manager file=bible_db log=dible_db full=y ignore=y 
+
+system/manager是用户名和密码 
+file=bible_db 是要导入的文件 
+log=dible_db是生成日志的名称 
+full=y是导入整个文件 
+ignore=y是忽略创建错误 
+
+详细用法可在“运行”中输入cmd进入命令窗口键入 
+'IMP HELP=Y' 获取帮助信息提示
