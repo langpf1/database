@@ -1,0 +1,11 @@
+INSERT INTO account ( account_id,account_parent,account_description,account_type,account_rollup,Custom_Members ) VALUES(1000,NULL,'Assets','Asset','~',NULL );
+INSERT INTO account ( account_id,account_parent,account_description,account_type,account_rollup,Custom_Members ) VALUES(2000,NULL,'Liabilities','Liability','~',NULL );
+INSERT INTO account ( account_id,account_parent,account_description,account_type,account_rollup,Custom_Members ) VALUES(3000,5000,'Net Sales','Income','+',NULL );
+INSERT INTO account ( account_id,account_parent,account_description,account_type,account_rollup,Custom_Members ) VALUES(3100,3000,'Gross Sales','Income','+','LookUpCube([Sales],(Measures.[Store Sales],+time.currentmember.UniqueName+,+ Store.currentmember.UniqueName+))' );
+INSERT INTO account ( account_id,account_parent,account_description,account_type,account_rollup,Custom_Members ) VALUES(3200,3000,'Cost of Goods Sold','Income','-',NULL );
+INSERT INTO account ( account_id,account_parent,account_description,account_type,account_rollup,Custom_Members ) VALUES(4000,5000,'Total Expense','Expense','-',NULL );
+INSERT INTO account ( account_id,account_parent,account_description,account_type,account_rollup,Custom_Members ) VALUES(4100,4000,'General & Administration','Expense','+',NULL );
+INSERT INTO account ( account_id,account_parent,account_description,account_type,account_rollup,Custom_Members ) VALUES(4200,4000,'Information Systems','Expense','+',NULL );
+INSERT INTO account ( account_id,account_parent,account_description,account_type,account_rollup,Custom_Members ) VALUES(4300,4000,'Marketing','Expense','+',NULL );
+INSERT INTO account ( account_id,account_parent,account_description,account_type,account_rollup,Custom_Members ) VALUES(4400,4000,'Lease','Expense','+',NULL );
+INSERT INTO account ( account_id,account_parent,account_description,account_type,account_rollup,Custom_Members ) VALUES(5000,NULL,'Net Income','Income','+',NULL );
